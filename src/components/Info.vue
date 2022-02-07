@@ -21,7 +21,7 @@
 			class="continue-button"
 			src="../assets/continue.png"
 		/>
-        <Help v-if="helpShow"></Help>
+        <Help v-if="helpShow" @close-help="helpShow = false"></Help>
 	</div>
 </template>
 

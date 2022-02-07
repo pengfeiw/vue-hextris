@@ -17,7 +17,7 @@
 			Time left before your combo streak disappears is indicated by the
 			colored lines on outer hexagon.
 		</p>
-        <el-button>关闭</el-button>
+        <el-button size="medium" @click="$emit('close-help')">close</el-button>
 	</div>
 </template>
 
