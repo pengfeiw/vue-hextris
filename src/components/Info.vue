@@ -4,24 +4,27 @@
 			v-if="status === GameStatus.PAUSED"
 			class="help-button"
 			src="../assets/help.png"
-            @click="helpClick"
+			@click="helpClick"
 		/>
 		<img
 			v-if="status === GameStatus.RUNNING"
 			class="pause-button"
 			src="../assets/pause.png"
+			@click="switchStatus(GameStatus.PAUSED)"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
 			class="restart-button"
 			src="../assets/restart.png"
+			@click="switchStatus(GameStatus.RUNNING)"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
 			class="continue-button"
 			src="../assets/continue.png"
+			@click="switchStatus(GameStatus.RUNNING)"
 		/>
-        <Help v-if="helpShow" @close-help="helpShow = false"></Help>
+		<Help v-if="helpShow" @close-help="helpShow = false"></Help>
 	</div>
 </template>
 
@@ -31,7 +34,8 @@ import { GameStatus } from "../engine/status";
 import Help from "./Help.vue";
 
 const props = {
-	status: Number
+	status: Number,
+    switchStatus: Function
 };
 
 const components ={
@@ -62,6 +66,7 @@ export default Vue.extend({
 #info {
 	width: 100%;
 	height: 100%;
+	position: fixed;
 	.help-button,
 	.pause-button,
 	.restart-button,
