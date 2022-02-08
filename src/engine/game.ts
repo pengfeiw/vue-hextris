@@ -70,13 +70,14 @@ class Game {
             const group = this.data.data[i];
             for (let j = 0; j < group.length; j++) {
                 const blockIndex = group[j];
-                const or = this.innerSideL + (this.blockSideL + 1) * j;
+                const or = this.innerSideL + (j + 1) * this.blockSideL;
                 const ir = this.innerSideL + this.blockSideL * j;
-                const o1 = {x: center.x - 0.5 * or, y: center.y - 0.5 * or / Math.tan(degreeToRadians(30))};
-                const o2 = {x: center.x + 0.5 * or, y: o1.y};
-                const i1 = {x: center.x - 0.5 * ir, y: center.y - 0.5 * ir / Math.tan(degreeToRadians(30))};
-                const i2 = {x: center.x + 0.5 * ir, y: o1.y};
+                const o1 = {x: -0.5 * or, y: -0.5 * or / Math.tan(degreeToRadians(30))};
+                const o2 = {x: 0.5 * or, y: o1.y};
+                const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
+                const i2 = {x: 0.5 * ir, y: i1.y};
 
+                ctx.translate(center.x, center.y);
                 ctx.rotate(degreeToRadians(60 * i));
                 ctx.beginPath();
                 ctx.fillStyle = getColorByData(blockIndex);
@@ -86,7 +87,7 @@ class Game {
                 ctx.lineTo(i1.x, i1.y);
                 ctx.closePath();
                 ctx.fill();
-                ctx.resetTransform();                
+                ctx.resetTransform();
             }
         }
     }
