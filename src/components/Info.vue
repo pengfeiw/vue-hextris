@@ -2,25 +2,25 @@
 	<div id="info">
 		<img
 			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART"
-			class="help-button"
+			class="help-button unselectable"
 			src="../assets/help.png"
 			@click="helpClick"
 		/>
 		<img
 			v-if="status === GameStatus.RUNNING"
-			class="pause-button"
+			class="pause-button unselectable"
 			src="../assets/pause.png"
 			@click="switchStatus(GameStatus.PAUSED)"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
-			class="restart-button"
+			class="restart-button unselectable"
 			src="../assets/restart.png"
 			@click="switchStatus(GameStatus.RUNNING)"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
-			class="continue-button"
+			class="continue-button unselectable"
 			src="../assets/continue.png"
 			@click="switchStatus(GameStatus.RUNNING)"
 		/>

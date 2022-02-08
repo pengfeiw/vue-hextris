@@ -1,12 +1,6 @@
 <template>
 	<div id="app">
-        <GameWin />
-		<!-- <el-button
-			v-if="status === GameStatus.UNSTART"
-			@click="switchStatus(GameStatus.RUNNING)"
-		>
-			start
-		</el-button> -->
+		<GameWin />
 		<Info />
 	</div>
 </template>
@@ -44,7 +38,7 @@ body {
 }
 * {
 	box-sizing: border-box;
-    color: rgba(5,68,92,1);
+	color: rgba(5, 68, 92, 1);
 }
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
@@ -54,5 +48,12 @@ body {
 	color: #2c3e50;
 	width: 100vw;
 	height: 100vh;
+
+	.unselectable {
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
 }
 </style>
