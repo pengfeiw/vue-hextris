@@ -1,7 +1,7 @@
 <template>
 	<div id="info">
 		<img
-			v-if="status === GameStatus.PAUSED"
+			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART"
 			class="help-button"
 			src="../assets/help.png"
 			@click="helpClick"

@@ -1,12 +1,12 @@
 <template>
 	<div id="app">
-		<span>{{ statusText }}</span>
-		<el-button
+        <GameWin />
+		<!-- <el-button
 			v-if="status === GameStatus.UNSTART"
 			@click="switchStatus(GameStatus.RUNNING)"
 		>
 			start
-		</el-button>
+		</el-button> -->
 		<Info />
 	</div>
 </template>
@@ -16,30 +16,18 @@ import Vue from "vue";
 import Info from "./components/Info.vue";
 import { GameStatus } from "./engine/status";
 import {mapState, mapMutations} from "vuex";
+import GameWin from "./components/GameWin.vue";
 
 export default Vue.extend({
 	name: "App",
 	components: {
 		Info,
+        GameWin
 	},
 	data: () => ({
         GameStatus
 	}),
 	computed: {
-		statusText: function () {
-			switch (this.$store.state.status) {
-				case GameStatus.UNSTART:
-					return "UNSTART";
-				case GameStatus.RUNNING:
-					return "RUNNING";
-				case GameStatus.PAUSED:
-					return "PAUSED";
-				case GameStatus.OVER:
-					return "OVER";
-				default:
-					throw new Error("unknow status type.");
-			}
-		},
         ...mapState(["status"])
 	},
     methods: {
@@ -56,6 +44,7 @@ body {
 }
 * {
 	box-sizing: border-box;
+    color: rgba(5,68,92,1);
 }
 #app {
 	font-family: Avenir, Helvetica, Arial, sans-serif;
