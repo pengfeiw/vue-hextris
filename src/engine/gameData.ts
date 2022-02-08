@@ -34,14 +34,6 @@ class GameData {
     public isOver() {
         return !this._data.every((group) => group.length <= this.groupSize);
     }
-    public rotateLeft() {
-        this._data = [...this._data.slice(1), this._data[0]];
-        return this._data;
-    }
-    public rotateRight() {
-        this._data = [this._data[this._data.length - 1], ...this._data.slice(0, 5)];
-        return this._data;
-    }
 }
 
 export default GameData;

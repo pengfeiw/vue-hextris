@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
+    "gsap": "^3.9.1",
     "vue": "^2.6.11",
     "vuex": "^3.6.2"
   },

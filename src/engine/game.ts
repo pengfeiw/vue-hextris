@@ -13,6 +13,7 @@ class Game {
     public data = new GameData();
     public outerSideL = 300;
     public innerSideL = 80;
+    public innerRotation = 60;
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
@@ -28,20 +29,21 @@ class Game {
     }
 
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
-        const o1 = {x: center.x + 0.5 * this.outerSideL, y: center.y - 0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
-        const o2 = {x: center.x + this.outerSideL, y: center.y};
-        const o3 = {x: o1.x, y: center.y + 0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
-        const o4 = {x: center.x - 0.5 * this.outerSideL, y: o3.y};
-        const o5 = {x: center.x - this.outerSideL, y: center.y};
+        const o1 = {x: 0.5 * this.outerSideL, y: -0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
+        const o2 = {x: this.outerSideL, y: 0};
+        const o3 = {x: o1.x, y: 0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
+        const o4 = {x: -0.5 * this.outerSideL, y: o3.y};
+        const o5 = {x: -this.outerSideL, y: 0};
         const o6 = {x: o4.x, y: o1.y};
 
-        const i1 = {x: center.x + 0.5 * this.innerSideL, y: center.y - 0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
-        const i2 = {x: center.x + this.innerSideL, y: center.y};
-        const i3 = {x: i1.x, y: center.y + 0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
-        const i4 = {x: center.x - 0.5 * this.innerSideL, y: i3.y};
-        const i5 = {x: center.x - this.innerSideL, y: center.y};
+        const i1 = {x: 0.5 * this.innerSideL, y: -0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
+        const i2 = {x: this.innerSideL, y: 0};
+        const i3 = {x: i1.x, y: 0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
+        const i4 = {x: -0.5 * this.innerSideL, y: i3.y};
+        const i5 = {x: -this.innerSideL, y: 0};
         const i6 = {x: i4.x, y: i1.y};
 
+        ctx.translate(center.x, center.y);
         ctx.beginPath();
         ctx.fillStyle = outerContainerColor;
         ctx.moveTo(o1.x, o1.y);
@@ -53,6 +55,7 @@ class Game {
         ctx.closePath();
         ctx.fill();
 
+        ctx.rotate(degreeToRadians(this.innerRotation));
         ctx.beginPath();
         ctx.fillStyle = innerContainerColor;
         ctx.moveTo(i1.x, i1.y);
@@ -63,6 +66,7 @@ class Game {
         ctx.lineTo(i6.x, i6.y);
         ctx.closePath();
         ctx.fill();
+        ctx.resetTransform();
     }
 
     private drawData(ctx: CanvasRenderingContext2D, center: Point) {
@@ -78,7 +82,7 @@ class Game {
                 const i2 = {x: 0.5 * ir, y: i1.y};
 
                 ctx.translate(center.x, center.y);
-                ctx.rotate(degreeToRadians(60 * i));
+                ctx.rotate(degreeToRadians(60 * i + this.innerRotation));
                 ctx.beginPath();
                 ctx.fillStyle = getColorByData(blockIndex);
                 ctx.moveTo(o1.x, o1.y);
