@@ -3,11 +3,11 @@
 		<span>{{ statusText }}</span>
 		<el-button
 			v-if="status === GameStatus.UNSTART"
-			@click="status = GameStatus.RUNNING"
+			@click="switchStatus(GameStatus.RUNNING)"
 		>
 			start
 		</el-button>
-		<Info :status="status" :switchStatus="switchStatus" />
+		<Info />
 	</div>
 </template>
 
@@ -15,6 +15,7 @@
 import Vue from "vue";
 import Info from "./components/Info.vue";
 import { GameStatus } from "./engine/status";
+import {mapState, mapMutations} from "vuex";
 
 export default Vue.extend({
 	name: "App",
@@ -22,12 +23,11 @@ export default Vue.extend({
 		Info,
 	},
 	data: () => ({
-		status: GameStatus.UNSTART,
         GameStatus
 	}),
 	computed: {
 		statusText: function () {
-			switch (this.status) {
+			switch (this.$store.state.status) {
 				case GameStatus.UNSTART:
 					return "UNSTART";
 				case GameStatus.RUNNING:
@@ -40,11 +40,10 @@ export default Vue.extend({
 					throw new Error("unknow status type.");
 			}
 		},
+        ...mapState(["status"])
 	},
     methods: {
-        switchStatus: function(status) {
-            this.status = status;
-        }
+        ...mapMutations(["switchStatus"])
     }
 });
 </script>

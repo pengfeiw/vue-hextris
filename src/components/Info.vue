@@ -32,11 +32,7 @@
 import Vue from "vue";
 import { GameStatus } from "../engine/status";
 import Help from "./Help.vue";
-
-const props = {
-	status: Number,
-    switchStatus: Function
-};
+import {mapState, mapMutations} from "vuex";
 
 const components ={
     Help
@@ -50,15 +46,24 @@ const data = () => ({
 const methods = {
     helpClick: function() {
         this.helpShow = true;
-    }
+    },
+    ...mapMutations(["switchStatus"])
+    // switchStatus(status) {
+    //     // this.$store.commit("switchStatus", status);
+    //     console.log(status);
+    // }
+};
+
+const computed = {
+    ...mapState(["status"])
 };
 
 export default Vue.extend({
 	name: "Info",
-	props,
     data,
     components,
-    methods
+    methods,
+    computed
 });
 </script>
 
