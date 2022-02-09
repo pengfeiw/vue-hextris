@@ -1,10 +1,27 @@
-import GameData, {getColorByData} from "./gameData";
+import GameData, {getColorByData, Data} from "./gameData";
 import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
+import Timer from "./timer";
+import * as MathUtil from "./math";
 
 type Point = {
     x: number;
     y: number;
+}
+
+interface ActiveBlock {
+    /** the type(color) of block. */
+    type: Data;
+    /** 
+     * the block direction, 
+     * there are six direction of block,
+     * they are top(0)、right top(1)、right bottom(2)、bottom(3)、left bottom(4)、left top(5)
+     * */
+    index: number;
+    /**
+     * multiply this value with Game.outerSideL get the innerSideL of block, 
+     */
+    blockInnerSideL2OutersideL: number;
 }
 
 const outerContainerColor = "rgba(234,234,234,1)";
@@ -12,15 +29,33 @@ const innerContainerColor = "rgba(80,80,80,1)";
 const startButtonColor = "rgba(255, 255, 255, 1)";
 const textColor = "rgba(32,73,105,1)";
 
-
 class Game {
     public data = new GameData();
     public outerSideL = 300;
     public innerSideL = 80;
     public innerRotation = 60;
     public score = 0;
+    private _timer: Timer;
+    private _generateBlockDelay = 2000;
+    public speed = 1;
+    public activeBlock: ActiveBlock[] = [
+        {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
+        {index: 1, type: 2, blockInnerSideL2OutersideL: 1.2},
+        {index: 2, type: 3, blockInnerSideL2OutersideL: 1.1},
+        {index: 3, type: 4, blockInnerSideL2OutersideL: 1.0},
+        {index: 4, type: 1, blockInnerSideL2OutersideL: 0.9},
+        {index: 5, type: 2, blockInnerSideL2OutersideL: 0.7},
+    ];
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
+    }
+    public constructor() {
+        this._timer = new Timer(this.generateRandomBlock, this._generateBlockDelay, false);
+    }
+
+    public start() {
+        this.generateRandomBlock();
+        this._timer.start();
     }
     public draw(ctx: CanvasRenderingContext2D, status: GameStatus) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
@@ -31,7 +66,8 @@ class Game {
             y: height * 0.5
         };
         this.drawContainer(ctx, center);
-        this.drawData(ctx, center);
+        this.drawSettledBlock(ctx, center);
+        this.drawActiveBlock(ctx, center);
         this.drawUnstartInfo(ctx, center, status);
     }
 
@@ -76,7 +112,7 @@ class Game {
         ctx.resetTransform();
     }
 
-    private drawData(ctx: CanvasRenderingContext2D, center: Point) {
+    private drawSettledBlock(ctx: CanvasRenderingContext2D, center: Point) {
         for (let i = 0; i < this.data.data.length; i++) {
             const group = this.data.data[i];
             for (let j = 0; j < group.length; j++) {
@@ -100,6 +136,30 @@ class Game {
                 ctx.fill();
                 ctx.resetTransform();
             }
+        }
+    }
+
+    private drawActiveBlock(ctx: CanvasRenderingContext2D, center: Point) {
+        for (let i = 0; i < this.activeBlock.length; i++) {
+            const blockInnerSideL = this.activeBlock[i].blockInnerSideL2OutersideL * this.outerSideL;
+            const ir = blockInnerSideL;
+            const or = blockInnerSideL + this.blockSideL;
+            const o1 = {x: -0.5 * or, y: -0.5 * or / Math.tan(degreeToRadians(30))};
+            const o2 = {x: 0.5 * or, y: o1.y};
+            const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
+            const i2 = {x: 0.5 * ir, y: i1.y};
+
+            ctx.translate(center.x, center.y);
+            ctx.rotate(degreeToRadians(60 * i));
+            ctx.beginPath();
+            ctx.fillStyle = getColorByData(this.activeBlock[i].type);
+            ctx.moveTo(o1.x, o1.y);
+            ctx.lineTo(o2.x, o2.y);
+            ctx.lineTo(i2.x, i2.y);
+            ctx.lineTo(i1.x, i1.y);
+            ctx.closePath();
+            ctx.fill();
+            ctx.resetTransform();
         }
     }
 
@@ -136,6 +196,17 @@ class Game {
             ctx.fillStyle = "rgba(255, 255, 255, 1)";
             ctx.fillText(this.score.toString(), center.x, center.y);
         }
+    }
+
+    private generateRandomBlock() {
+        const index = MathUtil.randomInteger(0, 6);
+        const type = MathUtil.randomInteger(1, 5) as Data;
+        const blockInnerSideL2OutersideL = 1.3;
+        this.activeBlock.push({
+            index,
+            type,
+            blockInnerSideL2OutersideL
+        });
     }
 }
 

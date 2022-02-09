@@ -1,5 +1,5 @@
-type Data = 1 | 2 | 3 | 4;
-type OneGroupData = Data[];
+export type Data = 1 | 2 | 3 | 4;
+export type OneGroupData = Data[];
 
 export const getColorByData = (data: Data) => {
     switch (data) {
