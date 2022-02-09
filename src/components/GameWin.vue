@@ -11,6 +11,7 @@ import {mapState} from "vuex";
 import HighScore from "./HighScore.vue";
 import Game from "../engine/game";
 import {gsap} from "gsap";
+import {GameStatus} from "../engine/status";
 
 const data = () => ({
     ctx: null,
@@ -25,7 +26,7 @@ const computed = {
 
 const methods = {
     loop() {
-        this.game.draw(this.ctx);
+        this.game.draw(this.ctx, this.status);
         requestAnimationFrame(this.loop);
     },
     setSize() {
@@ -52,10 +53,12 @@ const methods = {
         window.addEventListener("resize", this.setSize);
         canvas.addEventListener("click", (event) => {
             const x = event.offsetX;
-            if (x > canvas.width * 0.5) {
-                rotateRight();
-            } else {
-                rotateLeft();
+            if (this.status === GameStatus.RUNNING) {
+                if (x > canvas.width * 0.5) {
+                    rotateRight();
+                } else {
+                    rotateLeft();
+                }
             }
         });
         window.addEventListener("keydown", (event) => {

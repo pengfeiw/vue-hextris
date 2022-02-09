@@ -1,5 +1,6 @@
 import GameData, {getColorByData} from "./gameData";
 import {degreeToRadians} from "./math";
+import {GameStatus} from "./status";
 
 type Point = {
     x: number;
@@ -8,6 +9,9 @@ type Point = {
 
 const outerContainerColor = "rgba(234,234,234,1)";
 const innerContainerColor = "rgba(80,80,80,1)";
+const startButtonColor = "rgba(255, 255, 255, 1)";
+const textColor = "rgba(32,73,105,1)";
+
 
 class Game {
     public data = new GameData();
@@ -17,7 +21,8 @@ class Game {
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
-    public draw(ctx: CanvasRenderingContext2D) {
+    public draw(ctx: CanvasRenderingContext2D, status: GameStatus) {
+        ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         const width = ctx.canvas.clientWidth;
         const height = ctx.canvas.clientHeight;
         const center = {
@@ -26,6 +31,7 @@ class Game {
         };
         this.drawContainer(ctx, center);
         this.drawData(ctx, center);
+        this.drawUnstartInfo(ctx, center, status);
     }
 
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
@@ -93,6 +99,34 @@ class Game {
                 ctx.fill();
                 ctx.resetTransform();
             }
+        }
+    }
+
+    private drawUnstartInfo(ctx: CanvasRenderingContext2D, center: Point, status: GameStatus) {
+        // set text alignment
+        ctx.textAlign = "center";
+        ctx.textBaseline = "bottom";
+        if (status === GameStatus.UNSTART) {
+            // draw start button
+            const startBtnSideL = 0.7 * this.innerSideL;
+            const startBtnP1 = {x: center.x - startBtnSideL * Math.sqrt(3) / 4, y: center.y - startBtnSideL * 0.5};
+            const startBtnP2 = {x: center.x + startBtnSideL * Math.sqrt(3) / 4, y: center.y};
+            const startBtnP3 = {x: startBtnP1.x, y: center.y + startBtnSideL * 0.5};
+
+            ctx.beginPath();
+            ctx.fillStyle = startButtonColor;
+            ctx.moveTo(startBtnP1.x, startBtnP1.y);
+            ctx.lineTo(startBtnP2.x, startBtnP2.y);
+            ctx.lineTo(startBtnP3.x, startBtnP3.y);
+            ctx.closePath();
+            ctx.fill();
+
+            // draw title
+            ctx.font = "10rem serif";
+            ctx.fillStyle = textColor;
+            ctx.fillText("Hextris", center.x, center.y - 1.2 * this.innerSideL);
+        } else if (status === GameStatus.PAUSED) {
+            //
         }
     }
 }

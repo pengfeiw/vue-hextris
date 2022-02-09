@@ -24,6 +24,11 @@
 			src="../assets/continue.png"
 			@click="switchStatus(GameStatus.RUNNING)"
 		/>
+		<div
+			v-if="status === GameStatus.UNSTART"
+			class="start-button unselectable"
+			@click="switchStatus(GameStatus.RUNNING)"
+		></div>
 		<Help v-if="helpShow" @close-help="helpShow = false"></Help>
 	</div>
 </template>
@@ -75,6 +80,7 @@ export default Vue.extend({
 	.help-button,
 	.pause-button,
 	.restart-button,
+    .start-button,
 	.continue-button {
 		position: fixed;
 		cursor: pointer;
@@ -94,6 +100,14 @@ export default Vue.extend({
 	.restart-button {
 		bottom: 15px;
 		left: 15px;
+	}
+
+	.start-button {
+		height: 100px;
+		width: 100px;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
 	}
 }
 </style>
