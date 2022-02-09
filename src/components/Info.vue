@@ -1,5 +1,6 @@
 <template>
 	<div id="info">
+		<div class="fog" v-if="status === GameStatus.PAUSED"></div>
 		<img
 			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART"
 			class="help-button unselectable"
@@ -29,6 +30,21 @@
 			class="start-button unselectable"
 			@click="switchStatus(GameStatus.RUNNING)"
 		></div>
+		<div
+			v-if="status === GameStatus.PAUSED"
+			class="paused-info unselectable"
+		>
+			<div class="pause-title">Game Paused</div>
+			<div>
+				<a
+					class="github-link"
+					href="https://github.com/pengfeiw/vue-hextris"
+					target="_blank"
+				>
+					Find some issue? click here to help improve the code.
+				</a>
+			</div>
+		</div>
 		<Help v-if="helpShow" @close-help="helpShow = false"></Help>
 	</div>
 </template>
@@ -80,7 +96,7 @@ export default Vue.extend({
 	.help-button,
 	.pause-button,
 	.restart-button,
-    .start-button,
+	.start-button,
 	.continue-button {
 		position: fixed;
 		cursor: pointer;
@@ -105,9 +121,36 @@ export default Vue.extend({
 	.start-button {
 		height: 100px;
 		width: 100px;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+	}
+
+	.fog {
+		position: fixed;
+		top: 0;
+		left: 0;
+		bottom: 0;
+		right: 0;
+		background-color: rgba(255, 255, 255, 0.5);
+	}
+
+	.paused-info {
+		position: fixed;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+
+		.pause-title {
+			font-size: 3rem;
+			margin-bottom: 10px;
+		}
+
+		.github-link {
+			&:hover {
+				color: rgba(59,154,156,1);
+			}
+		}
 	}
 }
 </style>

@@ -18,6 +18,7 @@ class Game {
     public outerSideL = 300;
     public innerSideL = 80;
     public innerRotation = 60;
+    public score = 0;
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
@@ -103,11 +104,7 @@ class Game {
     }
 
     private drawUnstartInfo(ctx: CanvasRenderingContext2D, center: Point, status: GameStatus) {
-        // set text alignment
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
         if (status === GameStatus.UNSTART) {
-            // draw start button
             const startBtnSideL = 0.7 * this.innerSideL;
             const startBtnP1 = {x: center.x - startBtnSideL * Math.sqrt(3) / 4, y: center.y - startBtnSideL * 0.5};
             const startBtnP2 = {x: center.x + startBtnSideL * Math.sqrt(3) / 4, y: center.y};
@@ -121,12 +118,23 @@ class Game {
             ctx.closePath();
             ctx.fill();
 
-            // draw title
+            ctx.textAlign = "center";
+            ctx.textBaseline = "bottom";
             ctx.font = "10rem serif";
             ctx.fillStyle = textColor;
             ctx.fillText("Hextris", center.x, center.y - 1.2 * this.innerSideL);
-        } else if (status === GameStatus.PAUSED) {
-            //
+
+            ctx.textAlign = "center";
+            ctx.textBaseline = "top";
+            ctx.font = "1.5rem serif";
+            ctx.fillStyle = textColor;
+            ctx.fillText("Click Triangle or press SPACE to start!", center.x, center.y + 1.2 * this.innerSideL);
+        } else {
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.font = "2rem serif";
+            ctx.fillStyle = "rgba(255, 255, 255, 1)";
+            ctx.fillText(this.score.toString(), center.x, center.y);
         }
     }
 }

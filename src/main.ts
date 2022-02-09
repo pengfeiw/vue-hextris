@@ -10,7 +10,7 @@ import {GameStatus} from './engine/status';
 Vue.use(Vuex);
 Vue.use(ElementUI);
 
-const store = new Vuex.Store({
+export const store = new Vuex.Store({
     state: {
         status: GameStatus.UNSTART
     },
@@ -20,7 +20,6 @@ const store = new Vuex.Store({
         }
     }
 });
-
 
 Vue.config.productionTip = false
 

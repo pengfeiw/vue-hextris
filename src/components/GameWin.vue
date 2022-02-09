@@ -7,7 +7,7 @@
 
 <script lang="js">
 import Vue from "vue";
-import {mapState} from "vuex";
+import {mapState, mapMutations} from "vuex";
 import HighScore from "./HighScore.vue";
 import Game from "../engine/game";
 import {gsap} from "gsap";
@@ -25,6 +25,7 @@ const computed = {
 };
 
 const methods = {
+    ...mapMutations(["switchStatus"]),
     loop() {
         this.game.draw(this.ctx, this.status);
         requestAnimationFrame(this.loop);
@@ -50,6 +51,13 @@ const methods = {
                 innerRotation: this.game.innerRotation + 60
             });
         };
+        const toggleRun = () => {
+            if (this.status === GameStatus.RUNNING) {
+                this.switchStatus(GameStatus.PAUSED);
+            } else if (this.status === GameStatus.UNSTART || this.status === GameStatus.PAUSED){
+                this.switchStatus(GameStatus.RUNNING);
+            }
+        }
         window.addEventListener("resize", this.setSize);
         canvas.addEventListener("click", (event) => {
             const x = event.offsetX;
@@ -62,12 +70,15 @@ const methods = {
             }
         });
         window.addEventListener("keydown", (event) => {
-            switch (event.key) {
+            switch (event.code) {
                 case "ArrowLeft":
                     rotateLeft();
                     break;
                 case "ArrowRight":
                     rotateRight();
+                    break;
+                case "Space":
+                    toggleRun();
                     break;
                 default:
                     break;
