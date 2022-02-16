@@ -26,8 +26,8 @@ const computed = {
 
 const methods = {
     ...mapMutations(["switchStatus"]),
-    loop() {
-        this.game.draw(this.ctx, this.status);
+    loop(time) {
+        this.game.tick(this.ctx, this.status, time);
         requestAnimationFrame(this.loop);
     },
     setSize() {
@@ -90,7 +90,7 @@ const methods = {
 const mounted = function(){
     this.setSize();
     this.on();
-    this.loop();
+    requestAnimationFrame(this.loop);
 };
 
 export default Vue.extend({

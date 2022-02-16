@@ -38,7 +38,7 @@ class Game {
     private _timer: Timer;
     private _generateBlockDelay = 2000;
     public speed = 1;
-    public activeBlock: ActiveBlock[] = [
+    public activeBlocks: ActiveBlock[] = [
         {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
         {index: 1, type: 2, blockInnerSideL2OutersideL: 1.2},
         {index: 2, type: 3, blockInnerSideL2OutersideL: 1.1},
@@ -57,7 +57,18 @@ class Game {
         this.generateRandomBlock();
         this._timer.start();
     }
-    public draw(ctx: CanvasRenderingContext2D, status: GameStatus) {
+    public tick(ctx: CanvasRenderingContext2D, status: GameStatus, delta: number) {
+        if (status === GameStatus.RUNNING) {
+            for (let i = 0; i < this.activeBlocks.length; i++) {
+                this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * 0.000001;
+            }
+        }
+
+        this.updateData();
+
+        this.draw(ctx, status);
+    }
+    private draw(ctx: CanvasRenderingContext2D, status: GameStatus) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         const width = ctx.canvas.clientWidth;
         const height = ctx.canvas.clientHeight;
@@ -140,8 +151,8 @@ class Game {
     }
 
     private drawActiveBlock(ctx: CanvasRenderingContext2D, center: Point) {
-        for (let i = 0; i < this.activeBlock.length; i++) {
-            const blockInnerSideL = this.activeBlock[i].blockInnerSideL2OutersideL * this.outerSideL;
+        for (let i = 0; i < this.activeBlocks.length; i++) {
+            const blockInnerSideL = this.activeBlocks[i].blockInnerSideL2OutersideL * this.outerSideL;
             const ir = blockInnerSideL;
             const or = blockInnerSideL + this.blockSideL;
             const o1 = {x: -0.5 * or, y: -0.5 * or / Math.tan(degreeToRadians(30))};
@@ -152,7 +163,7 @@ class Game {
             ctx.translate(center.x, center.y);
             ctx.rotate(degreeToRadians(60 * i));
             ctx.beginPath();
-            ctx.fillStyle = getColorByData(this.activeBlock[i].type);
+            ctx.fillStyle = getColorByData(this.activeBlocks[i].type);
             ctx.moveTo(o1.x, o1.y);
             ctx.lineTo(o2.x, o2.y);
             ctx.lineTo(i2.x, i2.y);
@@ -202,11 +213,31 @@ class Game {
         const index = MathUtil.randomInteger(0, 6);
         const type = MathUtil.randomInteger(1, 5) as Data;
         const blockInnerSideL2OutersideL = 1.3;
-        this.activeBlock.push({
+        this.activeBlocks.push({
             index,
             type,
             blockInnerSideL2OutersideL
         });
+    }
+
+    private updateData() {
+        for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
+            const activeBlock = this.activeBlocks[i];
+            const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
+            let index = (activeBlock.index - Math.ceil(this.innerRotation / 60) % 6) % 6;
+            if (index < 0) {
+                index += 6;
+            }
+
+            const groupData = this.data.data[index];
+            const groupOuterSideL = this.innerSideL + groupData.length * this.blockSideL;
+
+            if (groupOuterSideL >= innerSideL) {
+                groupData.push(activeBlock.type);
+
+                this.activeBlocks.splice(i, 1);
+            }
+        }
     }
 }
 
