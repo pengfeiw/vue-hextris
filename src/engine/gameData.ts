@@ -42,6 +42,7 @@ class GameData {
     public eliminate() {
         let resData: boolean[][] = [];
         const checkData: boolean[][] = [];
+        let eliminateCount = 0;
 
         for (let i = 0; i < this.data.length; i++) {
             const group = this.data[i];
@@ -102,9 +103,12 @@ class GameData {
             for (let j = resData[i].length - 1; j >= 0; j--) {
                 if (resData[i][j]) {
                     this.data[i].splice(j, 1);
+                    eliminateCount++;
                 }
             }
         }
+
+        return eliminateCount;
     }
 }
 

@@ -225,7 +225,9 @@ class Game {
 
     private updateData() {
         if (this._status === GameStatus.RUNNING) {
-            this.data.eliminate();
+            const eliminateCount = this.data.eliminate();
+
+            this.score += eliminateCount * 10;
 
             for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
                 const activeBlock = this.activeBlocks[i];
