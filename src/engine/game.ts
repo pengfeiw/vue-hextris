@@ -1,7 +1,7 @@
 import GameData, {getColorByData, Data} from "./gameData";
 import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
-import Timer from "./timer";
+import {Timer} from "./timer";
 import * as MathUtil from "./math";
 
 type Point = {
