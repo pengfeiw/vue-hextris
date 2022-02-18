@@ -225,6 +225,8 @@ class Game {
 
     private updateData() {
         if (this._status === GameStatus.RUNNING) {
+            this.data.eliminate();
+
             for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
                 const activeBlock = this.activeBlocks[i];
                 const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
