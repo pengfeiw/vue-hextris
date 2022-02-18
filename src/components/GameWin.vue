@@ -24,10 +24,19 @@ const computed = {
     ...mapState(["status"])
 };
 
+let lastFrame = 0;
+
 const methods = {
     ...mapMutations(["switchStatus"]),
     loop(time) {
-        this.game.tick(this.ctx, this.status, time);
+        if (lastFrame === -1) {
+            lastFrame = time;
+        }
+        const delta = time - lastFrame;
+        if (delta > 0) {
+            this.game.tick(this.ctx, this.status, delta);
+        }
+        lastFrame = time;
         requestAnimationFrame(this.loop);
     },
     setSize() {
@@ -40,16 +49,20 @@ const methods = {
     on() {
         const canvas = this.$refs.canvas;
         const rotateLeft = () => {
-            gsap.to(this.game, {
-                duration: 0.1,
-                innerRotation: this.game.innerRotation - 60
-            });
+            if (this.status === GameStatus.RUNNING) {
+                gsap.to(this.game, {
+                    duration: 0.1,
+                    innerRotation: this.game.innerRotation - 60
+                });
+            }
         };
         const rotateRight = () => {
-            gsap.to(this.game, {
-                duration: 0.1,
-                innerRotation: this.game.innerRotation + 60
-            });
+            if (this.status === GameStatus.RUNNING) {
+                gsap.to(this.game, {
+                    duration: 0.1,
+                    innerRotation: this.game.innerRotation + 60
+                });
+            }
         };
         const toggleRun = () => {
             if (this.status === GameStatus.RUNNING) {

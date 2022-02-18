@@ -1,7 +1,7 @@
 import GameData, {getColorByData, Data} from "./gameData";
 import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
-import {Timer} from "./timer";
+import {IntervalTimer} from "./timer";
 import * as MathUtil from "./math";
 
 type Point = {
@@ -33,34 +33,38 @@ class Game {
     public data = new GameData();
     public outerSideL = 300;
     public innerSideL = 80;
-    public innerRotation = 60;
+    public innerRotation = 0;
     public score = 0;
-    private _timer: Timer;
-    private _generateBlockDelay = 2000;
+    private _timer: IntervalTimer;
+    private _generateBlockDelay = 3000;
+    private _status: GameStatus = GameStatus.UNSTART;
     public speed = 1;
     public activeBlocks: ActiveBlock[] = [
-        {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
-        {index: 1, type: 2, blockInnerSideL2OutersideL: 1.2},
-        {index: 2, type: 3, blockInnerSideL2OutersideL: 1.1},
-        {index: 3, type: 4, blockInnerSideL2OutersideL: 1.0},
-        {index: 4, type: 1, blockInnerSideL2OutersideL: 0.9},
-        {index: 5, type: 2, blockInnerSideL2OutersideL: 0.7},
+        // {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
+        // {index: 1, type: 2, blockInnerSideL2OutersideL: 1.2},
+        // {index: 2, type: 3, blockInnerSideL2OutersideL: 1.1},
+        // {index: 3, type: 4, blockInnerSideL2OutersideL: 1.0},
+        // {index: 4, type: 1, blockInnerSideL2OutersideL: 0.9},
+        // {index: 5, type: 2, blockInnerSideL2OutersideL: 0.7},
     ];
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
     public constructor() {
-        this._timer = new Timer(this.generateRandomBlock, this._generateBlockDelay, false);
+        this._timer = new IntervalTimer(this.generateRandomBlock.bind(this), this._generateBlockDelay, false);
     }
-
-    public start() {
-        this.generateRandomBlock();
-        this._timer.start();
+    public pause() {
+        this._timer.pause();
+    }
+    public resume() {
+        this._timer.resume();
     }
     public tick(ctx: CanvasRenderingContext2D, status: GameStatus, delta: number) {
+        this.setStatus(status);
+
         if (status === GameStatus.RUNNING) {
             for (let i = 0; i < this.activeBlocks.length; i++) {
-                this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * 0.000001;
+                this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * 0.0003;
             }
         }
 
@@ -81,7 +85,6 @@ class Game {
         this.drawActiveBlock(ctx, center);
         this.drawUnstartInfo(ctx, center, status);
     }
-
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
         const o1 = {x: 0.5 * this.outerSideL, y: -0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
         const o2 = {x: this.outerSideL, y: 0};
@@ -161,7 +164,7 @@ class Game {
             const i2 = {x: 0.5 * ir, y: i1.y};
 
             ctx.translate(center.x, center.y);
-            ctx.rotate(degreeToRadians(60 * i));
+            ctx.rotate(degreeToRadians(60 * this.activeBlocks[i].index));
             ctx.beginPath();
             ctx.fillStyle = getColorByData(this.activeBlocks[i].type);
             ctx.moveTo(o1.x, o1.y);
@@ -221,23 +224,41 @@ class Game {
     }
 
     private updateData() {
-        for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
-            const activeBlock = this.activeBlocks[i];
-            const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
-            let index = (activeBlock.index - Math.ceil(this.innerRotation / 60) % 6) % 6;
-            if (index < 0) {
-                index += 6;
-            }
+        if (this._status === GameStatus.RUNNING) {
+            for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
+                const activeBlock = this.activeBlocks[i];
+                const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
+                let index = (activeBlock.index - Math.ceil(this.innerRotation / 60) % 6) % 6;
 
-            const groupData = this.data.data[index];
-            const groupOuterSideL = this.innerSideL + groupData.length * this.blockSideL;
+                if (index < 0) {
+                    index += 6;
+                }
 
-            if (groupOuterSideL >= innerSideL) {
-                groupData.push(activeBlock.type);
+                const groupData = this.data.data[index];
+                const groupOuterSideL = this.innerSideL + groupData.length * this.blockSideL;
 
-                this.activeBlocks.splice(i, 1);
+                if (groupOuterSideL >= innerSideL) {
+                    groupData.push(activeBlock.type);
+
+                    this.activeBlocks.splice(i, 1);
+                }
             }
         }
+    }
+
+    private setStatus(status: GameStatus) {
+        if (this._status !== status) {
+            if (this._status === GameStatus.RUNNING && status === GameStatus.PAUSED) {
+                this._timer.pause();
+            } else if (this._status === GameStatus.PAUSED && status === GameStatus.RUNNING) {
+                this._timer.resume();
+            } else if (this._status === GameStatus.UNSTART && status === GameStatus.RUNNING) {
+                this.generateRandomBlock();
+                this._timer.start();
+            }
+        }
+
+        this._status = status;
     }
 }
 
