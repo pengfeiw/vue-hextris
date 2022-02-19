@@ -21,16 +21,6 @@ class GameData {
     public get data() {
         return this._data;
     }
-    public constructor() {
-        // this._data = [
-        //     [1, 2, 3, 4],
-        //     [1, 1, 1],
-        //     [2, 3, 4],
-        //     [],
-        //     [3],
-        //     []
-        // ];
-    }
     public isOver() {
         return !this._data.every((group) => group.length <= this.groupSize);
     }

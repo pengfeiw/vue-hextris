@@ -3,6 +3,7 @@ import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
 import {IntervalTimer} from "./timer";
 import * as MathUtil from "./math";
+import {store} from "../main";
 
 type Point = {
     x: number;
@@ -36,6 +37,7 @@ class Game {
     public innerRotation = 0;
     public score = 0;
     private _timer: IntervalTimer;
+    private _speedTimer: IntervalTimer;
     private _generateBlockDelay = 3000;
     private _status: GameStatus = GameStatus.UNSTART;
     public speed = 1;
@@ -52,27 +54,37 @@ class Game {
     }
     public constructor() {
         this._timer = new IntervalTimer(this.generateRandomBlock.bind(this), this._generateBlockDelay, false);
+        this._speedTimer = new IntervalTimer(() => {
+            this.speed += 0.1;
+        }, 10000, false)
     }
     public pause() {
         this._timer.pause();
+        this._speedTimer.pause();
     }
     public resume() {
         this._timer.resume();
+        this._speedTimer.resume();
+    }
+    public start() {
+        this._timer.start();
+        this._speedTimer.start();
     }
     public tick(ctx: CanvasRenderingContext2D, status: GameStatus, delta: number) {
         this.setStatus(status);
 
+        this.checkOver();
         if (status === GameStatus.RUNNING) {
             for (let i = 0; i < this.activeBlocks.length; i++) {
-                this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * 0.0003;
+                this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * this.speed * 0.0003;
             }
         }
 
         this.updateData();
 
-        this.draw(ctx, status);
+        this.draw(ctx);
     }
-    private draw(ctx: CanvasRenderingContext2D, status: GameStatus) {
+    private draw(ctx: CanvasRenderingContext2D) {
         ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
         const width = ctx.canvas.clientWidth;
         const height = ctx.canvas.clientHeight;
@@ -83,7 +95,7 @@ class Game {
         this.drawContainer(ctx, center);
         this.drawSettledBlock(ctx, center);
         this.drawActiveBlock(ctx, center);
-        this.drawUnstartInfo(ctx, center, status);
+        this.drawUnstartInfo(ctx, center);
     }
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
         const o1 = {x: 0.5 * this.outerSideL, y: -0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
@@ -177,8 +189,8 @@ class Game {
         }
     }
 
-    private drawUnstartInfo(ctx: CanvasRenderingContext2D, center: Point, status: GameStatus) {
-        if (status === GameStatus.UNSTART) {
+    private drawUnstartInfo(ctx: CanvasRenderingContext2D, center: Point) {
+        if (this._status === GameStatus.UNSTART) {
             const startBtnSideL = 0.7 * this.innerSideL;
             const startBtnP1 = {x: center.x - startBtnSideL * Math.sqrt(3) / 4, y: center.y - startBtnSideL * 0.5};
             const startBtnP2 = {x: center.x + startBtnSideL * Math.sqrt(3) / 4, y: center.y};
@@ -213,14 +225,18 @@ class Game {
     }
 
     private generateRandomBlock() {
-        const index = MathUtil.randomInteger(0, 6);
-        const type = MathUtil.randomInteger(1, 5) as Data;
-        const blockInnerSideL2OutersideL = 1.3;
-        this.activeBlocks.push({
-            index,
-            type,
-            blockInnerSideL2OutersideL
-        });
+        const counts = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6];
+        const count = counts[MathUtil.randomInteger(0, counts.length)];
+        for (let i = 0; i < count; i++) {
+            const index = MathUtil.randomInteger(0, 6);
+            const type = MathUtil.randomInteger(1, 5) as Data;
+            const blockInnerSideL2OutersideL = 1.3;
+            this.activeBlocks.push({
+                index,
+                type,
+                blockInnerSideL2OutersideL
+            });
+        }
     }
 
     private updateData() {
@@ -253,16 +269,24 @@ class Game {
     private setStatus(status: GameStatus) {
         if (this._status !== status) {
             if (this._status === GameStatus.RUNNING && status === GameStatus.PAUSED) {
-                this._timer.pause();
+                this.pause();
             } else if (this._status === GameStatus.PAUSED && status === GameStatus.RUNNING) {
-                this._timer.resume();
+                this.resume();
             } else if (this._status === GameStatus.UNSTART && status === GameStatus.RUNNING) {
                 this.generateRandomBlock();
-                this._timer.start();
+                this.start();
+            } else if (status === GameStatus.OVER) {
+                this.pause();
             }
         }
 
         this._status = status;
+    }
+
+    private checkOver() {
+        if (this.data.isOver()) {
+            store.commit("switchStatus", GameStatus.OVER);
+        }
     }
 }
 

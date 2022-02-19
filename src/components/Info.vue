@@ -2,7 +2,7 @@
 	<div id="info">
 		<div class="fog" v-if="status === GameStatus.PAUSED"></div>
 		<img
-			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART"
+			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART || status === GameStatus.OVER"
 			class="help-button unselectable"
 			src="../assets/help.png"
 			@click="helpClick"
@@ -14,7 +14,7 @@
 			@click="switchStatus(GameStatus.PAUSED)"
 		/>
 		<img
-			v-if="status === GameStatus.PAUSED"
+			v-if="status === GameStatus.PAUSED || status === GameStatus.OVER"
 			class="restart-button unselectable"
 			src="../assets/restart.png"
 			@click="switchStatus(GameStatus.RUNNING)"
@@ -35,6 +35,21 @@
 			class="paused-info unselectable"
 		>
 			<div class="pause-title">Game Paused</div>
+			<div>
+				<a
+					class="github-link"
+					href="https://github.com/pengfeiw/vue-hextris"
+					target="_blank"
+				>
+					Find some issue? click here to help improve the code.
+				</a>
+			</div>
+		</div>
+		<div
+			v-if="status === GameStatus.OVER"
+			class="overed-info unselectable"
+		>
+			<div class="pause-title">Game Overed</div>
 			<div>
 				<a
 					class="github-link"
@@ -135,7 +150,7 @@ export default Vue.extend({
 		background-color: rgba(255, 255, 255, 0.5);
 	}
 
-	.paused-info {
+	.paused-info,.overed-info {
 		position: fixed;
 		top: 50%;
 		left: 50%;
@@ -148,7 +163,7 @@ export default Vue.extend({
 
 		.github-link {
 			&:hover {
-				color: rgba(59,154,156,1);
+				color: rgba(59, 154, 156, 1);
 			}
 		}
 	}
