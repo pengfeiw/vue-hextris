@@ -48,19 +48,22 @@ const methods = {
     },
     on() {
         const canvas = this.$refs.canvas;
+        let innerRotation = 0;
         const rotateLeft = () => {
             if (this.status === GameStatus.RUNNING) {
+                innerRotation -= 60;
                 gsap.to(this.game, {
                     duration: 0.1,
-                    innerRotation: this.game.innerRotation - 60
+                    innerRotation
                 });
             }
         };
         const rotateRight = () => {
             if (this.status === GameStatus.RUNNING) {
+                innerRotation += 60;
                 gsap.to(this.game, {
                     duration: 0.1,
-                    innerRotation: this.game.innerRotation + 60
+                    innerRotation
                 });
             }
         };
