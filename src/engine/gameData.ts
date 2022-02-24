@@ -1,8 +1,13 @@
-export type Data = 1 | 2 | 3 | 4;
+export type BlcokType = 1 | 2 | 3 | 4;
+export interface Data {
+    data: BlcokType;
+    visible: boolean;
+    willDelete?: boolean;
+}
 export type OneGroupData = Data[];
 
-export const getColorByData = (data: Data) => {
-    switch (data) {
+export const getColorByData = (type: BlcokType) => {
+    switch (type) {
         case 1:
             return "#FF7260";
         case 2:
@@ -44,18 +49,20 @@ class GameData {
             }
         }
 
-        const loop = (i: number, j: number, dataType: Data) => {
+        const loop = (i: number, j: number, dataType: BlcokType) => {
             if (!(i < this.data.length && i >= 0 && j < this.data[i].length && j >= 0)) {
+                checkData[i][j] = true;
                 return;
             }
 
-            if (this.data[i][j] !== dataType || resData[i][j] === true) {
+            if (this.data[i][j].willDelete || this.data[i][j].data !== dataType || resData[i][j] === true) {
+                checkData[i][j] = true;
                 return;
             }
-            
+
             resData[i][j] = true;
             checkData[i][j] = true;
-            
+
             if (j < this.data[i].length) {
                 loop(i, j + 1, dataType);
             }
@@ -70,7 +77,7 @@ class GameData {
             for (let j = 0; j < this.data[i].length; j++) {
                 if (checkData[i][j] === false) {
                     const temData2 = JSON.parse(JSON.stringify(resData)) as boolean[][];
-                    loop(i, j, this.data[i][j]);
+                    loop(i, j, this.data[i][j].data);
 
                     let preEliminatecount = 0;
                     for (let ii = 0; ii < temData2.length; ii++) {
@@ -92,11 +99,34 @@ class GameData {
         for (let i = 0; i < resData.length; i++) {
             for (let j = resData[i].length - 1; j >= 0; j--) {
                 if (resData[i][j]) {
-                    this.data[i].splice(j, 1);
+                    // this.data[i].splice(j, 1);
+                    this.data[i][j].willDelete = true;
                     eliminateCount++;
                 }
             }
         }
+
+        const interval = setInterval(() => {
+            for (let i = 0; i < resData.length; i++) {
+                for (let j = resData[i].length - 1; j >= 0; j--) {
+                    if (resData[i][j]) {
+                        this.data[i][j].visible = !this.data[i][j].visible;
+                    }
+                }
+            }
+        }, 200);
+
+        setTimeout(() => {
+            window.clearInterval(interval);
+
+            for (let i = 0; i < resData.length; i++) {
+                for (let j = resData[i].length - 1; j >= 0; j--) {
+                    if (resData[i][j]) {
+                        this.data[i].splice(j, 1);
+                    }
+                }
+            }
+        }, 600);
 
         return eliminateCount;
     }

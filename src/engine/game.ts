@@ -1,4 +1,4 @@
-import GameData, {getColorByData, Data} from "./gameData";
+import GameData, {getColorByData, BlcokType} from "./gameData";
 import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
 import {IntervalTimer} from "./timer";
@@ -12,7 +12,7 @@ type Point = {
 
 interface ActiveBlock {
     /** the type(color) of block. */
-    type: Data;
+    type: BlcokType;
     /** 
      * the block direction, 
      * there are six direction of block,
@@ -95,7 +95,7 @@ class Game {
         this.drawContainer(ctx, center);
         this.drawSettledBlock(ctx, center);
         this.drawActiveBlock(ctx, center);
-        this.drawUnstartInfo(ctx, center);
+        this.drawUnrunningInfo(ctx, center);
     }
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
         const o1 = {x: 0.5 * this.outerSideL, y: -0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
@@ -137,30 +137,32 @@ class Game {
         ctx.fill();
         ctx.resetTransform();
     }
-
     private drawSettledBlock(ctx: CanvasRenderingContext2D, center: Point) {
         for (let i = 0; i < this.data.data.length; i++) {
             const group = this.data.data[i];
-            for (let j = 0; j < group.length; j++) {
-                const blockIndex = group[j];
-                const or = this.innerSideL + (j + 1) * this.blockSideL;
-                const ir = this.innerSideL + this.blockSideL * j;
-                const o1 = {x: -0.5 * or, y: -0.5 * or / Math.tan(degreeToRadians(30))};
-                const o2 = {x: 0.5 * or, y: o1.y};
-                const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
-                const i2 = {x: 0.5 * ir, y: i1.y};
 
-                ctx.translate(center.x, center.y);
-                ctx.rotate(degreeToRadians(60 * i + this.innerRotation));
-                ctx.beginPath();
-                ctx.fillStyle = getColorByData(blockIndex);
-                ctx.moveTo(o1.x, o1.y);
-                ctx.lineTo(o2.x, o2.y);
-                ctx.lineTo(i2.x, i2.y);
-                ctx.lineTo(i1.x, i1.y);
-                ctx.closePath();
-                ctx.fill();
-                ctx.resetTransform();
+            for (let j = 0; j < group.length; j++) {
+                if (group[j].visible) {
+                    const blockData = group[j].data;
+                    const or = this.innerSideL + (j + 1) * this.blockSideL;
+                    const ir = this.innerSideL + this.blockSideL * j;
+                    const o1 = {x: -0.5 * or, y: -0.5 * or / Math.tan(degreeToRadians(30))};
+                    const o2 = {x: 0.5 * or, y: o1.y};
+                    const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
+                    const i2 = {x: 0.5 * ir, y: i1.y};
+
+                    ctx.translate(center.x, center.y);
+                    ctx.rotate(degreeToRadians(60 * i + this.innerRotation));
+                    ctx.beginPath();
+                    ctx.fillStyle = getColorByData(blockData);
+                    ctx.moveTo(o1.x, o1.y);
+                    ctx.lineTo(o2.x, o2.y);
+                    ctx.lineTo(i2.x, i2.y);
+                    ctx.lineTo(i1.x, i1.y);
+                    ctx.closePath();
+                    ctx.fill();
+                    ctx.resetTransform();
+                }
             }
         }
     }
@@ -189,7 +191,7 @@ class Game {
         }
     }
 
-    private drawUnstartInfo(ctx: CanvasRenderingContext2D, center: Point) {
+    private drawUnrunningInfo(ctx: CanvasRenderingContext2D, center: Point) {
         if (this._status === GameStatus.UNSTART) {
             const startBtnSideL = 0.7 * this.innerSideL;
             const startBtnP1 = {x: center.x - startBtnSideL * Math.sqrt(3) / 4, y: center.y - startBtnSideL * 0.5};
@@ -227,9 +229,10 @@ class Game {
     private generateRandomBlock() {
         const counts = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6];
         const count = counts[MathUtil.randomInteger(0, counts.length)];
+        const indexes = [0, 1, 2, 3, 4, 5];
         for (let i = 0; i < count; i++) {
-            const index = MathUtil.randomInteger(0, 6);
-            const type = MathUtil.randomInteger(1, 5) as Data;
+            const [index] = indexes.splice(~~(Math.random() * indexes.length), 1);
+            const type = MathUtil.randomInteger(1, 5) as BlcokType;
             const blockInnerSideL2OutersideL = 1.3;
             this.activeBlocks.push({
                 index,
@@ -244,11 +247,11 @@ class Game {
             const eliminateCount = this.data.eliminate();
 
             this.score += eliminateCount * 10;
-
             for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
                 const activeBlock = this.activeBlocks[i];
                 const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
                 let index = (activeBlock.index - Math.ceil(this.innerRotation / 60) % 6) % 6;
+
 
                 if (index < 0) {
                     index += 6;
@@ -258,7 +261,10 @@ class Game {
                 const groupOuterSideL = this.innerSideL + groupData.length * this.blockSideL;
 
                 if (groupOuterSideL >= innerSideL) {
-                    groupData.push(activeBlock.type);
+                    groupData.push({
+                        data: activeBlock.type,
+                        visible: true
+                    });
 
                     this.activeBlocks.splice(i, 1);
                 }
