@@ -27,7 +27,7 @@ class GameData {
         return this._data;
     }
     public isOver() {
-        return !this._data.every((group) => group.length <= this.groupSize);
+        return !this._data.every((group) => (group.filter((item) => item.willDelete === false).length <= this.groupSize));
     }
 
     /**

@@ -16,6 +16,7 @@ import {GameStatus} from "../engine/status";
 const data = () => ({
     ctx: null,
     game: new Game(),
+    speedup: false
 });
 const components = {
     HighScore
@@ -32,8 +33,11 @@ const methods = {
         if (lastFrame === -1) {
             lastFrame = time;
         }
-        const delta = time - lastFrame;
+        let delta = time - lastFrame;
         if (delta > 0) {
+            if (this.speedup) {
+                delta *= 10;
+            }
             this.game.tick(this.ctx, this.status, delta);
         }
         lastFrame = time;
@@ -93,12 +97,19 @@ const methods = {
                 case "ArrowRight":
                     rotateRight();
                     break;
+                case "ArrowDown":
+                    this.speedup = true;
+                    break;
                 case "Space":
                     toggleRun();
                     break;
                 default:
                     break;
             }
+        });
+
+        window.addEventListener("keyup", () => {
+            this.speedup = false;
         });
     }
 };
