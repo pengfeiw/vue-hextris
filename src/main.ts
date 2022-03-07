@@ -5,18 +5,24 @@ import App from './App.vue'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import Vuex from 'vuex'
-import {GameStatus} from './engine/status';
+import Game from './engine/game';
 
 Vue.use(Vuex);
 Vue.use(ElementUI);
 
 export const store = new Vuex.Store({
     state: {
-        status: GameStatus.UNSTART
+        game: new Game()
     },
     mutations: {
-        switchStatus(state, status) {
-            state.status = status;
+        restart(state) {
+            state.game = new Game();
+            state.game.start();
+        }
+    },
+    getters: {
+        status: (state) => {
+            return state.game.status;
         }
     }
 });

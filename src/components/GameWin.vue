@@ -7,28 +7,26 @@
 
 <script lang="js">
 import Vue from "vue";
-import {mapState, mapMutations} from "vuex";
+import {mapGetters, mapState} from "vuex";
 import HighScore from "./HighScore.vue";
-import Game from "../engine/game";
 import {gsap} from "gsap";
 import {GameStatus} from "../engine/status";
 
 const data = () => ({
     ctx: null,
-    game: new Game(),
     speedup: false
 });
 const components = {
     HighScore
 };
 const computed = {
-    ...mapState(["status"])
+    ...mapGetters(["status"]),
+    ...mapState(["game"])
 };
 
 let lastFrame = 0;
 
 const methods = {
-    ...mapMutations(["switchStatus"]),
     loop(time) {
         if (lastFrame === -1) {
             lastFrame = time;
@@ -38,7 +36,7 @@ const methods = {
             if (this.speedup) {
                 delta *= 10;
             }
-            this.game.tick(this.ctx, this.status, delta);
+            this.game.tick(this.ctx, delta);
         }
         lastFrame = time;
         requestAnimationFrame(this.loop);
@@ -73,11 +71,13 @@ const methods = {
         };
         const toggleRun = () => {
             if (this.status === GameStatus.RUNNING) {
-                this.switchStatus(GameStatus.PAUSED);
-            } else if (this.status === GameStatus.UNSTART || this.status === GameStatus.PAUSED){
-                this.switchStatus(GameStatus.RUNNING);
+                this.game.pause();
+            } else if (this.status === GameStatus.UNSTART){
+                this.game.start();
+            } else if (this.status === GameStatus.PAUSED) {
+                this.game.resume();
             }
-        }
+        };
         window.addEventListener("resize", this.setSize);
         canvas.addEventListener("click", (event) => {
             const x = event.offsetX;

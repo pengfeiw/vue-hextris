@@ -9,7 +9,7 @@
 import Vue from "vue";
 import Info from "./components/Info.vue";
 import { GameStatus } from "./engine/status";
-import {mapState, mapMutations} from "vuex";
+import {mapGetters} from "vuex";
 import GameWin from "./components/GameWin.vue";
 
 export default Vue.extend({
@@ -22,11 +22,8 @@ export default Vue.extend({
         GameStatus
 	}),
 	computed: {
-        ...mapState(["status"])
-	},
-    methods: {
-        ...mapMutations(["switchStatus"])
-    }
+        ...mapGetters(["status"])
+	}
 });
 </script>
 

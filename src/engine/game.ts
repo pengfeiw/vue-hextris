@@ -3,7 +3,6 @@ import {degreeToRadians} from "./math";
 import {GameStatus} from "./status";
 import {IntervalTimer} from "./timer";
 import * as MathUtil from "./math";
-import {store} from "../main";
 
 type Point = {
     x: number;
@@ -31,6 +30,7 @@ const startButtonColor = "rgba(255, 255, 255, 1)";
 const textColor = "rgba(32,73,105,1)";
 
 class Game {
+    public status = GameStatus.UNSTART;
     public data = new GameData();
     public outerSideL = 300;
     public innerSideL = 80;
@@ -56,21 +56,25 @@ class Game {
         this._timer = new IntervalTimer(this.generateRandomBlock.bind(this), this._generateBlockDelay, false);
         this._speedTimer = new IntervalTimer(() => {
             this.speed += 0.1;
-        }, 10000, false)
+        }, 10000, false);
     }
     public pause() {
+        this.status = GameStatus.PAUSED;
         this._timer.pause();
         this._speedTimer.pause();
     }
     public resume() {
+        this.status = GameStatus.RUNNING;
         this._timer.resume();
         this._speedTimer.resume();
     }
     public start() {
+        this.status = GameStatus.RUNNING;
         this._timer.start();
         this._speedTimer.start();
     }
-    public tick(ctx: CanvasRenderingContext2D, status: GameStatus, delta: number) {
+    public tick(ctx: CanvasRenderingContext2D, delta: number) {
+        const status = this.status;
         this.setStatus(status);
 
         this.checkOver();
@@ -291,7 +295,7 @@ class Game {
 
     private checkOver() {
         if (this.data.isOver()) {
-            store.commit("switchStatus", GameStatus.OVER);
+            this.status = GameStatus.OVER;
         }
     }
 }

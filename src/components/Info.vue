@@ -11,24 +11,24 @@
 			v-if="status === GameStatus.RUNNING"
 			class="pause-button unselectable"
 			src="../assets/pause.png"
-			@click="switchStatus(GameStatus.PAUSED)"
+			@click="game.pause()"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED || status === GameStatus.OVER"
 			class="restart-button unselectable"
 			src="../assets/restart.png"
-			@click="switchStatus(GameStatus.RUNNING)"
+			@click="restart()"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
 			class="continue-button unselectable"
 			src="../assets/continue.png"
-			@click="switchStatus(GameStatus.RUNNING)"
+			@click="game.resume()"
 		/>
 		<div
 			v-if="status === GameStatus.UNSTART"
 			class="start-button unselectable"
-			@click="switchStatus(GameStatus.RUNNING)"
+			@click="game.start()"
 		></div>
 		<div
 			v-if="status === GameStatus.PAUSED"
@@ -66,9 +66,9 @@
 
 <script lang="js">
 import Vue from "vue";
-import { GameStatus } from "../engine/status";
+import {GameStatus} from "../engine/status";
 import Help from "./Help.vue";
-import {mapState, mapMutations} from "vuex";
+import {mapGetters, mapMutations, mapState} from "vuex";
 
 const components ={
     Help
@@ -83,15 +83,12 @@ const methods = {
     helpClick: function() {
         this.helpShow = true;
     },
-    ...mapMutations(["switchStatus"])
-    // switchStatus(status) {
-    //     // this.$store.commit("switchStatus", status);
-    //     console.log(status);
-    // }
+    ...mapMutations(["restart"])
 };
 
 const computed = {
-    ...mapState(["status"])
+    ...mapGetters(["status"]),
+    ...mapState(["game"])
 };
 
 export default Vue.extend({
