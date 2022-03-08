@@ -35,8 +35,8 @@ class GameData {
      * 递归回溯检查是否可消除
      */
     public eliminate() {
-        let resData: boolean[][] = [];
-        const checkData: boolean[][] = [];
+        let resData: boolean[][] = []; // false 表示不用消除，true 表示需要消除
+        let checkData: boolean[][] = [];
         let eliminateCount = 0;
 
         for (let i = 0; i < this.data.length; i++) {
@@ -51,12 +51,11 @@ class GameData {
 
         const loop = (i: number, j: number, dataType: BlcokType) => {
             if (!(i < this.data.length && i >= 0 && j < this.data[i].length && j >= 0)) {
-                checkData[i][j] = true;
                 return;
             }
 
             if (this.data[i][j].willDelete || this.data[i][j].data !== dataType || resData[i][j] === true) {
-                checkData[i][j] = true;
+                // checkData[i][j] = true;
                 return;
             }
 
@@ -76,12 +75,13 @@ class GameData {
         for (let i = 0; i < this.data.length; i++) {
             for (let j = 0; j < this.data[i].length; j++) {
                 if (checkData[i][j] === false) {
-                    const temData2 = JSON.parse(JSON.stringify(resData)) as boolean[][];
+                    const preResData = JSON.parse(JSON.stringify(resData)) as boolean[][];
+                    const preCheckData = JSON.parse(JSON.stringify(checkData)) as boolean[][];
                     loop(i, j, this.data[i][j].data);
 
                     let preEliminatecount = 0;
-                    for (let ii = 0; ii < temData2.length; ii++) {
-                        preEliminatecount += temData2[ii].filter((value) => value).length;
+                    for (let ii = 0; ii < preResData.length; ii++) {
+                        preEliminatecount += preResData[ii].filter((value) => value).length;
                     }
 
                     let curEliminatecount = 0;
@@ -90,7 +90,8 @@ class GameData {
                     }
 
                     if (curEliminatecount - preEliminatecount < 3) {
-                        resData = temData2;
+                        resData = preResData;
+                        checkData = preCheckData;
                     }
                 }
             }

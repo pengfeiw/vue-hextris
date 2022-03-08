@@ -72,6 +72,7 @@ class Game {
     public constructor() {
         this._speedTimer = new IntervalTimer(() => {
             this.speed += 0.1;
+            this._generateBlockDelay -= 20;
         }, 10000, false);
 
         const highscoreStr = localStorage.getItem("highscore");
@@ -109,9 +110,6 @@ class Game {
         }
         this._lastTickTime = now;
 
-        // check game over
-        this.checkOver();
-
         // move active blocks
         if (status === GameStatus.RUNNING) {
             for (let i = 0; i < this.activeBlocks.length; i++) {
@@ -120,6 +118,8 @@ class Game {
         }
 
         this.updateData();
+        // check game over
+        this.checkOver();
 
         this.draw(ctx);
     }
