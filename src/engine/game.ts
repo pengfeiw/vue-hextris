@@ -36,9 +36,10 @@ class Game {
     public innerSideL = 80;
     public innerRotation = 0;
     public score = 0;
-    private _timer: IntervalTimer;
     private _speedTimer: IntervalTimer;
     private _generateBlockDelay = 3000;
+    private _generateBlockElapse = 0;
+    private _lastTickTime = 0;
     public speed = 1;
     public activeBlocks: ActiveBlock[] = [
         // {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
@@ -52,30 +53,43 @@ class Game {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
     public constructor() {
-        this._timer = new IntervalTimer(this.generateRandomBlock.bind(this), this._generateBlockDelay, false);
         this._speedTimer = new IntervalTimer(() => {
             this.speed += 0.1;
         }, 10000, false);
     }
     public pause() {
         this.status = GameStatus.PAUSED;
-        this._timer.pause();
         this._speedTimer.pause();
     }
     public resume() {
         this.status = GameStatus.RUNNING;
-        this._timer.resume();
         this._speedTimer.resume();
     }
     public start() {
         this.status = GameStatus.RUNNING;
-        this._timer.start();
         this._speedTimer.start();
+
+        this._lastTickTime = Date.now();
+        this.generateRandomBlock();
     }
     public tick(ctx: CanvasRenderingContext2D, delta: number) {
         const status = this.status;
+        
+        // generate random block
+        const now = Date.now();
+        if (this.status === GameStatus.RUNNING) {
+            this._generateBlockElapse += now - this._lastTickTime;
+            if (this._generateBlockElapse >= this._generateBlockDelay) {
+                this.generateRandomBlock();
+                this._generateBlockElapse = 0;
+            }
+        }
+        this._lastTickTime = now;
 
+        // check game over
         this.checkOver();
+
+        // move active blocks
         if (status === GameStatus.RUNNING) {
             for (let i = 0; i < this.activeBlocks.length; i++) {
                 this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * this.speed * 0.0003;
