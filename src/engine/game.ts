@@ -39,7 +39,6 @@ class Game {
     private _timer: IntervalTimer;
     private _speedTimer: IntervalTimer;
     private _generateBlockDelay = 3000;
-    private _status: GameStatus = GameStatus.UNSTART;
     public speed = 1;
     public activeBlocks: ActiveBlock[] = [
         // {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
@@ -75,7 +74,6 @@ class Game {
     }
     public tick(ctx: CanvasRenderingContext2D, delta: number) {
         const status = this.status;
-        this.setStatus(status);
 
         this.checkOver();
         if (status === GameStatus.RUNNING) {
@@ -196,7 +194,7 @@ class Game {
     }
 
     private drawUnrunningInfo(ctx: CanvasRenderingContext2D, center: Point) {
-        if (this._status === GameStatus.UNSTART) {
+        if (this.status === GameStatus.UNSTART) {
             const startBtnSideL = 0.7 * this.innerSideL;
             const startBtnP1 = {x: center.x - startBtnSideL * Math.sqrt(3) / 4, y: center.y - startBtnSideL * 0.5};
             const startBtnP2 = {x: center.x + startBtnSideL * Math.sqrt(3) / 4, y: center.y};
@@ -247,7 +245,7 @@ class Game {
     }
 
     private updateData() {
-        if (this._status === GameStatus.RUNNING) {
+        if (this.status === GameStatus.RUNNING) {
             const eliminateCount = this.data.eliminate();
 
             this.score += eliminateCount * 10;
@@ -274,23 +272,6 @@ class Game {
                 }
             }
         }
-    }
-
-    private setStatus(status: GameStatus) {
-        if (this._status !== status) {
-            if (this._status === GameStatus.RUNNING && status === GameStatus.PAUSED) {
-                this.pause();
-            } else if (this._status === GameStatus.PAUSED && status === GameStatus.RUNNING) {
-                this.resume();
-            } else if (this._status === GameStatus.UNSTART && status === GameStatus.RUNNING) {
-                this.generateRandomBlock();
-                this.start();
-            } else if (status === GameStatus.OVER) {
-                this.pause();
-            }
-        }
-
-        this._status = status;
     }
 
     private checkOver() {
