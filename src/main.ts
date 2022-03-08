@@ -16,6 +16,7 @@ export const store = new Vuex.Store({
     },
     mutations: {
         restart(state) {
+            state.game.updateScoreToLocalstorage();
             state.game = new Game();
             state.game.start();
         }

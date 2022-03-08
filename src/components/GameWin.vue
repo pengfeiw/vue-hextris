@@ -111,6 +111,16 @@ const methods = {
         window.addEventListener("keyup", () => {
             this.speedup = false;
         });
+
+        window.addEventListener("beforeunload", () => {
+            this.game.updateScoreToLocalstorage();
+        });
+
+        document.addEventListener("visibilitychange", () => {
+            if (document.hidden) {
+                this.game.pause();
+            }
+        });
     }
 };
 
@@ -127,7 +137,7 @@ export default Vue.extend({
     computed,
     mounted,
     methods
-})
+});
 </script>
 
 <style lang="less" scoped>

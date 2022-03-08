@@ -1,22 +1,20 @@
 <template>
 	<div id="high-score" class="unselectable">
 		<div class="title">HIGH SCORE</div>
-		<div class="value">{{ highscore() }}</div>
+		<div class="value">{{ game.highScore }}</div>
 	</div>
 </template>
 
 <script lang="js">
-    import Vue from "vue";
+import Vue from "vue";
+import {mapState} from "vuex";
 
-    export default Vue.extend({
-        name: "HighScore",
-        methods: {
-            highscore() {
-                const highscore = localStorage.getItem("highscore");
-                return highscore ? highscore : 0;
-            }
-        }
-    });
+export default Vue.extend({
+    name: "HighScore",
+    computed: {
+        ...mapState(["game"])
+    }
+});
 </script>
 
 <style lang="less" scoped>

@@ -50,6 +50,7 @@ class Game {
     public outerSideL = 300;
     public innerSideL = 80;
     public innerRotation = 0;
+    public highScore = 0;
     public score = 0;
     private _speedTimer: IntervalTimer;
     private _generateBlockDelay = 3000;
@@ -72,6 +73,11 @@ class Game {
         this._speedTimer = new IntervalTimer(() => {
             this.speed += 0.1;
         }, 10000, false);
+
+        const highscoreStr = localStorage.getItem("highscore");
+        if (highscoreStr) {
+            this.highScore = parseInt(highscoreStr);
+        }
     }
     public pause() {
         this.status = GameStatus.PAUSED;
@@ -168,7 +174,7 @@ class Game {
         let pIndex = 1;
         ctx.moveTo(points[0].x, points[0].y);
 
-        while(pIndex <= 5 && lenPercent > 1 / 6) {
+        while (pIndex <= 5 && lenPercent > 1 / 6) {
             ctx.lineTo(points[pIndex].x, points[pIndex].y);
             pIndex++;
             lenPercent -= 1 / 6;
@@ -180,7 +186,7 @@ class Game {
             y: p2.y - p1.y
         });
         const last = MathUtil.addVec(p1, MathUtil.multiplyVectorByScalar(vec, lenPercent * this.outerSideL * 6))
-        
+
         if (MathUtil.getPointDistance(last, points[0]) < 0.01) {
             ctx.closePath();
         } else {
@@ -302,6 +308,9 @@ class Game {
             const eliminateCount = this.data.eliminate();
 
             this.score += eliminateCount * 10;
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+            }
             for (let i = this.activeBlocks.length - 1; i >= 0; i--) {
                 const activeBlock = this.activeBlocks[i];
                 const innerSideL = activeBlock.blockInnerSideL2OutersideL * this.outerSideL;
@@ -331,6 +340,9 @@ class Game {
         if (this.data.isOver()) {
             this.status = GameStatus.OVER;
         }
+    }
+    public updateScoreToLocalstorage() {
+        localStorage.setItem("highscore", this.highScore.toString());
     }
 }
 

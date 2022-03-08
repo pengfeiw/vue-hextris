@@ -33,7 +33,6 @@ class GameData {
 
     /**
      * 递归回溯检查是否可消除
-     * @returns 
      */
     public eliminate() {
         let resData: boolean[][] = [];
