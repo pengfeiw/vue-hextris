@@ -29,6 +29,21 @@ const innerContainerColor = "rgba(80,80,80,1)";
 const startButtonColor = "rgba(255, 255, 255, 1)";
 const textColor = "rgba(32,73,105,1)";
 
+/**
+ * 获取中心点在 (0, 0) 点的六边形的六个顶点
+ * @param sideLen 六边形边长
+ */
+const getHextrisPoints = (sideLen: number) => {
+    const p1 = {x: 0.5 * sideLen, y: -0.5 * sideLen / Math.tan(degreeToRadians(30))};
+    const p2 = {x: sideLen, y: 0};
+    const p3 = {x: p1.x, y: 0.5 * sideLen / Math.tan(degreeToRadians(30))};
+    const p4 = {x: -0.5 * sideLen, y: p3.y};
+    const p5 = {x: -sideLen, y: 0};
+    const p6 = {x: p4.x, y: p1.y};
+
+    return [p1, p2, p3, p4, p5, p6];
+};
+
 class Game {
     public status = GameStatus.UNSTART;
     public data = new GameData();
@@ -40,6 +55,7 @@ class Game {
     private _generateBlockDelay = 3000;
     private _generateBlockElapse = 0;
     private _lastTickTime = 0;
+    private _outlineColor = getColorByData(1);
     public speed = 1;
     public activeBlocks: ActiveBlock[] = [
         // {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
@@ -74,7 +90,7 @@ class Game {
     }
     public tick(ctx: CanvasRenderingContext2D, delta: number) {
         const status = this.status;
-        
+
         // generate random block
         const now = Date.now();
         if (this.status === GameStatus.RUNNING) {
@@ -82,6 +98,7 @@ class Game {
             if (this._generateBlockElapse >= this._generateBlockDelay) {
                 this.generateRandomBlock();
                 this._generateBlockElapse = 0;
+                this._outlineColor = getColorByData(MathUtil.randomInteger(1, 5) as BlcokType);
             }
         }
         this._lastTickTime = now;
@@ -108,25 +125,15 @@ class Game {
             x: width * 0.5,
             y: height * 0.5
         };
+        this.drawOutline(ctx, center);
         this.drawContainer(ctx, center);
         this.drawSettledBlock(ctx, center);
         this.drawActiveBlock(ctx, center);
         this.drawUnrunningInfo(ctx, center);
     }
     private drawContainer(ctx: CanvasRenderingContext2D, center: Point) {
-        const o1 = {x: 0.5 * this.outerSideL, y: -0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
-        const o2 = {x: this.outerSideL, y: 0};
-        const o3 = {x: o1.x, y: 0.5 * this.outerSideL / Math.tan(degreeToRadians(30))};
-        const o4 = {x: -0.5 * this.outerSideL, y: o3.y};
-        const o5 = {x: -this.outerSideL, y: 0};
-        const o6 = {x: o4.x, y: o1.y};
-
-        const i1 = {x: 0.5 * this.innerSideL, y: -0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
-        const i2 = {x: this.innerSideL, y: 0};
-        const i3 = {x: i1.x, y: 0.5 * this.innerSideL / Math.tan(degreeToRadians(30))};
-        const i4 = {x: -0.5 * this.innerSideL, y: i3.y};
-        const i5 = {x: -this.innerSideL, y: 0};
-        const i6 = {x: i4.x, y: i1.y};
+        const [o1, o2, o3, o4, o5, o6] = getHextrisPoints(this.outerSideL);
+        const [i1, i2, i3, i4, i5, i6] = getHextrisPoints(this.innerSideL);
 
         ctx.translate(center.x, center.y);
         ctx.beginPath();
@@ -151,6 +158,38 @@ class Game {
         ctx.lineTo(i6.x, i6.y);
         ctx.closePath();
         ctx.fill();
+        ctx.resetTransform();
+    }
+    private drawOutline(ctx: CanvasRenderingContext2D, center: Point) {
+        let lenPercent = 1 - this._generateBlockElapse / this._generateBlockDelay;
+        const points = getHextrisPoints(this.outerSideL);
+        ctx.translate(center.x, center.y);
+        ctx.beginPath();
+        let pIndex = 1;
+        ctx.moveTo(points[0].x, points[0].y);
+
+        while(pIndex <= 5 && lenPercent > 1 / 6) {
+            ctx.lineTo(points[pIndex].x, points[pIndex].y);
+            pIndex++;
+            lenPercent -= 1 / 6;
+        }
+        const p1 = points[pIndex - 1];
+        const p2 = points[pIndex % 6];
+        const vec = MathUtil.normalizeVector({
+            x: p2.x - p1.x,
+            y: p2.y - p1.y
+        });
+        const last = MathUtil.addVec(p1, MathUtil.multiplyVectorByScalar(vec, lenPercent * this.outerSideL * 6))
+        
+        if (MathUtil.getPointDistance(last, points[0]) < 0.01) {
+            ctx.closePath();
+        } else {
+            ctx.lineTo(last.x, last.y);
+        }
+
+        ctx.lineWidth = 10;
+        ctx.strokeStyle = this._outlineColor;
+        ctx.stroke();
         ctx.resetTransform();
     }
     private drawSettledBlock(ctx: CanvasRenderingContext2D, center: Point) {
