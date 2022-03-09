@@ -68,6 +68,8 @@ class Game {
         // {index: 4, type: 1, blockInnerSideL2OutersideL: 0.9},
         // {index: 5, type: 2, blockInnerSideL2OutersideL: 0.7},
     ];
+    /** 用于更新分数 */
+    private activeBlocks2: ActiveBlock[][] = [];
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
     }
@@ -118,8 +120,9 @@ class Game {
                 this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * this.speed * 0.0003;
             }
         }
-
-        this.updateData();
+        if (this.status === GameStatus.RUNNING) {
+            this.updateData();
+        }
         // check game over
         this.checkOver();
 
@@ -293,23 +296,25 @@ class Game {
         const counts = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 4, 5, 6];
         const count = counts[MathUtil.randomInteger(0, counts.length)];
         const indexes = [0, 1, 2, 3, 4, 5];
+        const blockGroup = [];
         for (let i = 0; i < count; i++) {
             const [index] = indexes.splice(~~(Math.random() * indexes.length), 1);
             const type = MathUtil.randomInteger(1, 5) as BlcokType;
             const blockInnerSideL2OutersideL = 1.3;
-            this.activeBlocks.push({
+            const block = {
                 index,
                 type,
                 blockInnerSideL2OutersideL
-            });
+            };
+            blockGroup.push(block);
+            this.activeBlocks.push(block);
         }
+
+        this.activeBlocks2.push(blockGroup);
     }
 
     private updateData() {
         if (this.status === GameStatus.RUNNING) {
-            const eliminateCount = this.data.eliminate();
-
-            this.score += eliminateCount * 10;
             if (this.score > this.highScore) {
                 this.highScore = this.score;
             }
@@ -333,6 +338,30 @@ class Game {
                     });
 
                     this.activeBlocks.splice(i, 1);
+
+                    // 消除block,更新分数
+                    let groupIndex = -1, groupBlockIndex = -1;
+                    for (let j = 0; j < this.activeBlocks2.length; j++) {
+                        const temIndex = this.activeBlocks2[j].indexOf(activeBlock);
+
+                        if (temIndex !== -1) {
+                            groupIndex = j;
+                            groupBlockIndex = temIndex;
+                            break;
+                        }
+                    }
+
+                    if (groupIndex !== -1 && groupBlockIndex !== -1) {
+                        if (this.activeBlocks2[groupIndex].length === 1) {
+                            this.activeBlocks2.splice(groupIndex, 1);
+                            let eliminateCount;
+                            while((eliminateCount = this.data.eliminate()) > 0) {
+                                this.score += eliminateCount * 10;
+                            }
+                        } else {
+                            this.activeBlocks2[groupIndex].splice(groupBlockIndex, 1);
+                        }
+                    }
                 }
             }
         }
