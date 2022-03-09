@@ -23,6 +23,7 @@ export default Vue.extend({
 	left: 50%;
 	transform: translateX(-50%);
 	top: 15px;
+    text-align: center;
 	.title {
 		color: rgba(59, 154, 156, 0.7);
 	}
