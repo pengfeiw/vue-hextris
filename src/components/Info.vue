@@ -3,25 +3,25 @@
 		<div class="fog" v-if="status === GameStatus.PAUSED"></div>
 		<img
 			v-if="status === GameStatus.PAUSED || status === GameStatus.UNSTART || status === GameStatus.OVER"
-			class="help-button unselectable"
+			class="control-button help-button unselectable"
 			src="../assets/help.png"
 			@click="helpClick"
 		/>
 		<img
 			v-if="status === GameStatus.RUNNING"
-			class="pause-button unselectable"
+			class="control-button pause-button unselectable"
 			src="../assets/pause.png"
 			@click="game.pause()"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED || status === GameStatus.OVER"
-			class="restart-button unselectable"
+			class="control-button restart-button unselectable"
 			src="../assets/restart.png"
 			@click="restart()"
 		/>
 		<img
 			v-if="status === GameStatus.PAUSED"
-			class="continue-button unselectable"
+			class="control-button continue-button unselectable"
 			src="../assets/continue.png"
 			@click="game.resume()"
 		/>
@@ -164,5 +164,17 @@ export default Vue.extend({
 			}
 		}
 	}
+
+    @media screen and (max-width: 800px) {
+        .control-button {
+            height: 60px
+        }
+    }
+
+    @media screen and (max-width: 400px) {
+        .control-button {
+            height: 40px;
+        }
+    }
 }
 </style>

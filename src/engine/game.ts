@@ -48,7 +48,9 @@ class Game {
     public status = GameStatus.UNSTART;
     public data = new GameData();
     public outerSideL = 300;
-    public innerSideL = 80;
+    public get innerSideL() {
+        return this.outerSideL * 0.27;
+    }
     public innerRotation = 0;
     public highScore = 0;
     public score = 0;
@@ -269,7 +271,7 @@ class Game {
 
             ctx.textAlign = "center";
             ctx.textBaseline = "bottom";
-            ctx.font = "10rem serif";
+            ctx.font = "5rem serif";
             ctx.fillStyle = textColor;
             ctx.fillText("Hextris", center.x, center.y - 1.2 * this.innerSideL);
 

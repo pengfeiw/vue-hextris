@@ -9,13 +9,13 @@ export type OneGroupData = Data[];
 export const getColorByData = (type: BlcokType) => {
     switch (type) {
         case 1:
-            return "#FF7260";
+            return "#2E94B9";
         case 2:
-            return "#9BD7D5";
+            return "#08D9D6";
         case 3:
-            return "#7ebc59";
+            return "#F0B775";
         case 4:
-            return "#AEC5EB";
+            return "#D25565";
         default:
             throw new Error("unkonw block dataIndex");
     }

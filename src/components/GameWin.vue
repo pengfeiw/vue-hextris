@@ -47,6 +47,11 @@ const methods = {
         canvas.height = window.innerHeight;
         const ctx = canvas.getContext("2d");
         this.ctx = ctx;
+
+        const minWH = Math.min(window.innerWidth, window.innerHeight);
+        if (minWH < 800) {
+            this.game.outerSideL = 0.4 * minWH;
+        }
     },
     on() {
         const canvas = this.$refs.canvas;
@@ -118,7 +123,9 @@ const methods = {
 
         document.addEventListener("visibilitychange", () => {
             if (document.hidden) {
-                this.game.pause();
+                if (this.game.status !== GameStatus.UNSTART) {
+                    this.game.pause();
+                }
             }
         });
     }
