@@ -12,7 +12,7 @@
 
 1. 在线
 
-你可以试玩[在线版本](https://pengfeiw.github.io/vue-hextrix).
+你可以试玩[在线版本](https://pengfeiw.github.io/vue-hextris).
 
 2. 本地
 
