@@ -1,5 +1,7 @@
 # Vue Hextris
 
+[中文说明](./README_CN.md)
+
 An addictive puzzle game, written with Vue.js.
 
 The design of this game come from [here](https://github.com/Hextris/hextris). It's interesting, I was attracted deeply when I first play this game. So I remake it with vue.js.
