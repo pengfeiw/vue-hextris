@@ -1,3 +1,5 @@
+import Game from "./game";
+
 export type BlcokType = 1 | 2 | 3 | 4;
 export interface Data {
     data: BlcokType;
@@ -34,7 +36,7 @@ class GameData {
     /**
      * 递归回溯检查是否可消除
      */
-    public eliminate() {
+    public eliminateUpdateScore(game: Game) {
         let resData: boolean[][] = []; // false 表示不用消除，true 表示需要消除
         let checkData: boolean[][] = [];
         let eliminateCount = 0;
@@ -116,7 +118,7 @@ class GameData {
                 }
             }
         }, 200);
-
+        
         setTimeout(() => {
             window.clearInterval(interval);
 
@@ -127,9 +129,19 @@ class GameData {
                     }
                 }
             }
+
+            if (eliminateCount > 0) {
+                this.eliminateUpdateScore(game);
+            }
         }, 600);
 
-        return eliminateCount;
+        if (eliminateCount > 0) {
+            game.score += eliminateCount * 10;
+
+            return true;
+        }
+
+        return false;
     }
 }
 

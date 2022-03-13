@@ -75,7 +75,9 @@ class Game {
     }
     public constructor() {
         this._speedTimer = new IntervalTimer(() => {
-            this.speed += 0.1;
+            if (this.speed <= 2.4) {
+                this.speed += 0.1;
+            }
             this._generateBlockDelay -= 20;
         }, 10000, false);
 
@@ -120,9 +122,8 @@ class Game {
                 this.activeBlocks[i].blockInnerSideL2OutersideL -= delta * this.speed * 0.0003;
             }
         }
-        if (this.status === GameStatus.RUNNING) {
-            this.updateData();
-        }
+
+        this.updateData();
         // check game over
         this.checkOver();
 
@@ -354,10 +355,7 @@ class Game {
                     if (groupIndex !== -1 && groupBlockIndex !== -1) {
                         if (this.activeBlocks2[groupIndex].length === 1) {
                             this.activeBlocks2.splice(groupIndex, 1);
-                            let eliminateCount;
-                            while((eliminateCount = this.data.eliminate()) > 0) {
-                                this.score += eliminateCount * 10;
-                            }
+                            this.data.eliminateUpdateScore(this);
                         } else {
                             this.activeBlocks2[groupIndex].splice(groupBlockIndex, 1);
                         }
