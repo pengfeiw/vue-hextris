@@ -34,7 +34,7 @@
 			v-if="status === GameStatus.PAUSED"
 			class="paused-info unselectable"
 		>
-			<div class="pause-title">Game Paused</div>
+			<div class="pause-title">Game Pause</div>
 			<div>
 				<a
 					class="github-link"
@@ -49,7 +49,7 @@
 			v-if="status === GameStatus.OVER"
 			class="overed-info unselectable"
 		>
-			<div class="pause-title">Game Overed</div>
+			<div class="pause-title">Game Over</div>
 			<div>
 				<a
 					class="github-link"
@@ -149,6 +149,7 @@ export default Vue.extend({
 
 	.paused-info,.overed-info {
 		position: fixed;
+        text-align: center;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
