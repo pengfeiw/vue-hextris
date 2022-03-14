@@ -147,6 +147,8 @@ class Game {
         const [o1, o2, o3, o4, o5, o6] = getHextrisPoints(this.outerSideL);
         const [i1, i2, i3, i4, i5, i6] = getHextrisPoints(this.innerSideL);
 
+        const trans = ctx.getTransform();
+
         ctx.translate(center.x, center.y);
         ctx.beginPath();
         ctx.fillStyle = outerContainerColor;
@@ -170,9 +172,11 @@ class Game {
         ctx.lineTo(i6.x, i6.y);
         ctx.closePath();
         ctx.fill();
-        ctx.resetTransform();
+
+        ctx.setTransform(trans);
     }
     private drawOutline(ctx: CanvasRenderingContext2D, center: Point) {
+        const trans =  ctx.getTransform();
         let lenPercent = 1 - this._generateBlockElapse / this._generateBlockDelay;
         const points = getHextrisPoints(this.outerSideL);
         ctx.translate(center.x, center.y);
@@ -202,7 +206,7 @@ class Game {
         ctx.lineWidth = 10;
         ctx.strokeStyle = this._outlineColor;
         ctx.stroke();
-        ctx.resetTransform();
+        ctx.setTransform(trans);
     }
     private drawSettledBlock(ctx: CanvasRenderingContext2D, center: Point) {
         for (let i = 0; i < this.data.data.length; i++) {
@@ -218,6 +222,7 @@ class Game {
                     const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
                     const i2 = {x: 0.5 * ir, y: i1.y};
 
+                    const trans = ctx.getTransform();
                     ctx.translate(center.x, center.y);
                     ctx.rotate(degreeToRadians(60 * i + this.innerRotation));
                     ctx.beginPath();
@@ -228,7 +233,8 @@ class Game {
                     ctx.lineTo(i1.x, i1.y);
                     ctx.closePath();
                     ctx.fill();
-                    ctx.resetTransform();
+                    
+                    ctx.setTransform(trans);
                 }
             }
         }
@@ -244,6 +250,7 @@ class Game {
             const i1 = {x: -0.5 * ir, y: -0.5 * ir / Math.tan(degreeToRadians(30))};
             const i2 = {x: 0.5 * ir, y: i1.y};
 
+            const trans = ctx.getTransform();
             ctx.translate(center.x, center.y);
             ctx.rotate(degreeToRadians(60 * this.activeBlocks[i].index));
             ctx.beginPath();
@@ -254,7 +261,7 @@ class Game {
             ctx.lineTo(i1.x, i1.y);
             ctx.closePath();
             ctx.fill();
-            ctx.resetTransform();
+            ctx.setTransform(trans);
         }
     }
 
