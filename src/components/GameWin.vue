@@ -43,11 +43,12 @@ const methods = {
     },
     setSize() {
         const canvas = this.$refs.canvas;
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
+        const dpr = window.devicePixelRatio || 1;
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
         const ctx = canvas.getContext("2d");
         this.ctx = ctx;
-
+        ctx.scale(dpr, dpr);
         const minWH = Math.min(window.innerWidth, window.innerHeight);
         if (minWH < 800) {
             this.game.outerSideL = 0.4 * minWH;
@@ -85,7 +86,8 @@ const methods = {
         };
         window.addEventListener("resize", this.setSize);
         canvas.addEventListener("click", (event) => {
-            const x = event.offsetX;
+            const dpr = window.devicePixelRatio || 1;
+            const x = event.offsetX * dpr;
             if (this.status === GameStatus.RUNNING) {
                 if (x > canvas.width * 0.5) {
                     rotateRight();
