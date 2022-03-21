@@ -7,8 +7,8 @@
 				the outer gray hexagon.
 			</p>
 			<p>
-				Press the right and left arrow keys to rotate the Hexagon. Press
-				the down arrow to speed up the block falling.
+				Press the <b>right</b> and <b>left</b> arrow keys to rotate the Hexagon. Press
+				the <b>down</b> arrow to speed up the block falling.
 			</p>
 			<p>
 				Clear blocks and get points by making 3 or more blocks of the

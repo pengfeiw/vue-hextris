@@ -131,8 +131,8 @@ export default Vue.extend({
 	}
 
 	.start-button {
-		height: 100px;
-		width: 100px;
+		height: 200px;
+		width: 200px;
 		left: 50%;
 		top: 50%;
 		transform: translate(-50%, -50%);
