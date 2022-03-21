@@ -8,7 +8,7 @@ The design of this game come from [here](https://github.com/Hextris/hextris). It
 
 So far, I haven't copied enough, There is a little difference between origin version and this version, but the core is same.
 
-## How to play
+## Where to play
 
 1. online
 
@@ -34,3 +34,25 @@ npm run serve
 ```
 
 open browser [http://localhost:8080](http://localhost:8080).
+
+## How to Control
+
+1. pc
+
+You can control it with left、right and down arrrow keys or mouse click.
+
+keys:
+- left arrow: rotate left
+- right arrow: rotate right
+- down arrow: speed down
+
+mouse:
+- click on left part: rotate left
+- click on right part: rotate right
+
+2. touchscreen device
+
+We Also support touch event, so you can play on you mobile.
+
+- touch on left part: rotate left
+- touch on right part: rotate right
