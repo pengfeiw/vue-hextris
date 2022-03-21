@@ -60,15 +60,10 @@ class Game {
     private _lastTickTime = 0;
     private _outlineColor = getColorByData(1);
     public speed = 1;
-    public activeBlocks: ActiveBlock[] = [
-        // {index: 0, type: 1, blockInnerSideL2OutersideL: 1.3},
-        // {index: 1, type: 2, blockInnerSideL2OutersideL: 1.2},
-        // {index: 2, type: 3, blockInnerSideL2OutersideL: 1.1},
-        // {index: 3, type: 4, blockInnerSideL2OutersideL: 1.0},
-        // {index: 4, type: 1, blockInnerSideL2OutersideL: 0.9},
-        // {index: 5, type: 2, blockInnerSideL2OutersideL: 0.7},
-    ];
-    /** 用于更新分数 */
+    public activeBlocks: ActiveBlock[] = [];
+    /**
+     * 用于确定更新分数的时机，只有当一组 active block 都变成 settled block 时，启动消除检测 
+    */
     private activeBlocks2: ActiveBlock[][] = [];
     public get blockSideL() {
         return (this.outerSideL - this.innerSideL) / this.data.groupSize;
@@ -124,9 +119,6 @@ class Game {
         }
 
         this.updateData();
-        // check game over
-        this.checkOver();
-
         this.draw(ctx);
     }
     private draw(ctx: CanvasRenderingContext2D) {
@@ -356,6 +348,8 @@ class Game {
                         if (this.activeBlocks2[groupIndex].length === 1) {
                             this.activeBlocks2.splice(groupIndex, 1);
                             this.data.eliminateUpdateScore(this);
+
+                            this.checkOver();
                         } else {
                             this.activeBlocks2[groupIndex].splice(groupBlockIndex, 1);
                         }
